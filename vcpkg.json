@@ -1,0 +1,11 @@
+{
+  "name": "instrument-target",
+  "version": "1.0.0",
+  "description": "A instrument target implemenation in C99 for use by Cpp, Go, and Lua",
+  "homepage": "https://github.com/falcon-autotuning/instrument-target",
+  "dependencies": [
+    "cmocka",
+    "lua"
+  ],
+  "builtin-baseline": "9942fb5f996ea431c5ed8fb8d2a53f31d08df62e"
+}
