@@ -36,44 +36,19 @@ The object is immutable after creation and must be released with `instrument_tar
 
 ***
 
-### Field access
-
-```c
-const char *instrument_call_stack_get_instrument_name(const CallStack *);
-const char *instrument_call_stack_get_channel_group(const CallStack *);
-int instrument_call_stack_get_channel(const CallStack *);
-const char *instrument_call_stack_get_command(const CallStack *);
-```
-
-Returned strings are owned by the `CallStack` and must not be modified or freed.
-
-***
-
-### Serialization
-
-```c
-char *instrument_call_stack_serialize(const CallStack *);
-CallStack *instrument_call_stack_deserialize(const char *buffer);
-```
-
-Serialization produces a fixed-size binary representation suitable for transmission or storage. The returned buffer must be freed with `free()`.
-
-***
-
 ## Lua Bindings
 
-Lua bindings are optional and controlled by the `BUILD_LUA` build option. When enabled, `CallStack` objects can be created and used directly from Lua as userdata with read-only access to their fields.
+Lua bindings are optional and controlled by the `BUILD_LUA` build option. When enabled, `InstrumentTarget` objects can be created and used directly from Lua as userdata with read-only access to their fields.
 
 ***
 
-### Creating CallStacks
+### Creating InstrumentTargets
 
-CallStacks are created using a table-based constructor:
+InstrumentTargets are created using a table-based constructor:
 
 ```lua
-local stack = instrument_call_stack.new{
+local target= instrument_target.new{
   instrument = "instrument",
-  command    = "command",
   group      = "group",   -- optional
   channel    = 1          -- optional
 }
@@ -82,7 +57,6 @@ local stack = instrument_call_stack.new{
 #### Required fields
 
 * `instrument`
-* `command`
 
 #### Optional fields
 
@@ -94,38 +68,36 @@ local stack = instrument_call_stack.new{
 ### Available methods
 
 ```lua
-stack:get_instrument_name()
-stack:get_channel_group()
-stack:get_channel()
-stack:get_command()
+target:get_instrument_name()
+target:get_channel_group()
+target:get_channel()
 
-stack:clone()
-stack:to_string()
+target:clone()
+target:to_string()
 ```
 
 #### Notes
 
-* `clone()` returns a new independent `CallStack`
+* `clone()` returns a new independent `InstrumentTarget`
 * `to_string()` returns a formatted string representation
-* `tostring(stack)` is also supported via Lua’s `__tostring` metamethod
+* `tostring(target)` is also supported via Lua’s `__tostring` metamethod
 
 ***
 
 ### Example
 
 ```lua
-local stack1 = instrument_call_stack.new{
+local target1 = instrument_call_target.new{
   instrument = "i",
   group = "g",
   channel = 1,
-  command = "cmd"
 }
 
-local stack2 = stack1:clone()
+local target2 = target1:clone()
 
-print(stack1:get_command())    -- "cmd"
-print(stack2:to_string())      -- CallStack(i,g,1,cmd)
-print(stack1 ~= stack2)        -- true
+print(target1:get_command())    -- "cmd"
+print(target2:to_string())      -- InstrumentTarget(i,g,1,cmd)
+print(target1 ~= target2)        -- true
 ```
 
 ***
@@ -135,35 +107,13 @@ print(stack1 ~= stack2)        -- true
 Only required fields need to be provided:
 
 ```lua
-local stack = instrument_call_stack.new{
+local target = instrument_target.new{
   instrument = "i",
-  command = "cmd"
 }
 
-print(stack:get_channel())      -- -1
-print(stack:get_channel_group())-- ""
+print(target:get_channel())      -- -1
+print(target:get_channel_group())-- ""
 ```
-
-***
-
-### Passing objects from C
-
-```c
-push_callstack_global(L, stack, owned, "stack");
-```
-
-This exposes a `CallStack` to Lua as a global value.  
-The `owned` flag determines whether Lua is responsible for freeing the object during garbage collection.
-
-***
-
-### Module registration
-
-```c
-register_instrument_call_stack(L);
-```
-
-Registers the `instrument_call_stack` module in the Lua state, enabling construction via `instrument_call_stack.new(...)`.
 
 ***
 
