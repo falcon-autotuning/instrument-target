@@ -26,8 +26,7 @@ Each field is stored as a fixed-size string, allowing for a compact and stable i
 InstrumentTarget *instrument_target_create(
     const char *instrument_name,
     const char *channel_group,
-    int channel,
-    const char *command);
+    int channel);
 
 void instrument_target_free(InstrumentTarget *target);
 ```
